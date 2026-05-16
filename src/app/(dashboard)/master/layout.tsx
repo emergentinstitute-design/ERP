@@ -1,7 +1,11 @@
 import { redirect } from 'next/navigation';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 
-export default async function HomePage() {
+export default async function MasterLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const supabase = await createServerSupabaseClient();
 
   const {
@@ -19,23 +23,9 @@ export default async function HomePage() {
     .eq('id', user.id)
     .single();
 
-  if (profileError || !profile?.role) {
-    redirect('/login');
+  if (profileError || profile?.role !== 'master') {
+    redirect('/');
   }
 
-  const role = profile.role;
-
-  if (role === 'master') {
-    redirect('/master');
-  }
-
-  if (role === 'admin') {
-    redirect('/admin');
-  }
-
-  if (role === 'teacher') {
-    redirect('/teacher');
-  }
-
-  redirect('/login');
+  return <>{children}</>;
 }
